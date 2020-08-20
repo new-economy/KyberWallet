@@ -1,9 +1,6 @@
-// token
-
 .token-input {
   background-color: white;
   box-shadow: 0 10px 40px 0 rgba($light-gray, .5);
-  border-radius: $global-radius;
   overflow: hidden;
   display: table;
   width: 100%;
@@ -73,18 +70,3 @@
   }
 }
 
-.token-compare {
-  color: #00ffd6;
-  font-weight: 600;
-  letter-spacing: .5px;
-  text-align: center;
-  span {
-    margin-left: 10px;
-    &.up {
-      color: $primary-color;
-    }
-    &.down {
-      color: $alert-color;
-    }
-  }
-}

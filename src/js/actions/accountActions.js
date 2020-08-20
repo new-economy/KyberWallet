@@ -64,17 +64,59 @@ export function throwPKeyError(error) {
   }
 }
 
-export function importNewAccount(address, type, keystring, ethereum, tokens, metamask = null) {
+export function promoCodeChange(value) {
   return {
-    type: "ACCOUNT.IMPORT_NEW_ACCOUNT_PENDING",
-    payload: { address, type, keystring, ethereum, tokens, metamask }
+    type: "ACCOUNT.PROMO_CODE_CHANGE",
+    payload: value
   }
 }
 
-export function importNewAccountComplete(account) {
+export function openPromoCodeModal() {
+  return {
+    type: "ACCOUNT.OPEN_PROMO_CODE_MODAL",
+  }
+}
+
+export function closePromoCodeModal() {
+  return {
+    type: "ACCOUNT.CLOSE_PROMO_CODE_MODAL",
+  }
+}
+
+export function openOtherConnectModal(tradeType) {
+  return {
+    type: "ACCOUNT.OPEN_OTHER_CONNECT_MODAL",
+    payload: tradeType
+  }
+}
+
+export function closeOtherConnectModal() {
+  return {
+    type: "ACCOUNT.CLOSE_OTHER_CONNECT_MODAL",
+  }
+}
+
+export function throwPromoCodeError(error) {
+  return {
+    type: "ACCOUNT.PROMO_CODE_ERROR",
+    payload: error
+  }
+}
+
+export function importNewAccount(
+  address, type, keystring, ethereum, walletType = null,
+  metamask = null, walletName = "", info = null, wallet = null
+) {
+  return {
+    type: "ACCOUNT.IMPORT_NEW_ACCOUNT_PENDING",
+    payload: { address, type, keystring, ethereum, walletType, metamask, walletName, info, wallet }
+  }
+}
+
+export function importNewAccountComplete(account, wallet, walletName, isOnMobile = null) {
   return {
     type: "ACCOUNT.IMPORT_NEW_ACCOUNT_FULFILLED",
-    payload: account
+    payload: {account, wallet, walletName, isOnMobile}
   }
 }
 
@@ -105,9 +147,22 @@ export function incManualNonceAccount(address) {
   }
 }
 
-export function importAccountMetamask(web3Service, networkId, ethereum, tokens, translate) {
+export function importAccountMetamask(web3Service, networkId, ethereum, translate, walletType = null) {
   return {
     type: "ACCOUNT.IMPORT_ACCOUNT_METAMASK",
-    payload: { web3Service, networkId, ethereum, tokens, translate }
+    payload: { web3Service, networkId, ethereum, translate, walletType }
+  }
+}
+
+export function setOnDAPP() {
+  return {
+    type: "ACCOUNT.SET_ON_DAPP"
+  }
+}
+
+export function setTotalBalanceAndAvailableTokens(totalBalanceInETH, availableTokens) {
+  return {
+    type: "ACCOUNT.SET_TOTAL_BALANCE_AND_AVAILABLE_TOKENS",
+    payload: { totalBalanceInETH, availableTokens }
   }
 }
