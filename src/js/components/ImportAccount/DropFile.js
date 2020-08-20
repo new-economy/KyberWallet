@@ -1,5 +1,4 @@
 import React from "react"
-
 import Dropzone from 'react-dropzone'
 
 const DropFile = (props) => {
@@ -26,17 +25,21 @@ const DropFile = (props) => {
       </p>
     }
   }
-  //console.log(keystring)
+
   return (
-    <Dropzone onDrop={props.onDrop} disablePreview={true} className="column column-block">
-      <div className="importer json">
-        <a ><img src={require('../../../assets/img/json.svg')}/>
-          <div className="description">{props.translate("import.from_keystore") || <span>Select or drag<br />your keystore</span>}</div>
-        </a>
-      </div>
-      {message}
+    <Dropzone onDrop={(e) => props.onDrop(e)} disablePreview={true} className="column column-block">
+
+      {({ getRootProps, getInputProps, isDragActive }) => {
+        return (
+          <div className="import-account__block theme__import-button" {...getRootProps() }>
+            <input {...getInputProps() } />          
+            <div className="import-account__icon json"/>
+            <div className="import-account__name">{props.translate("import.json") || "KEYSTORE"}</div>
+          </div>
+        )
+      }}
     </Dropzone>
-  )  
+  )
 }
 
 export default DropFile

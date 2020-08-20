@@ -1,3 +1,6 @@
+# IDE
+.idea
+
 # Logs
 logs
 *.log
@@ -71,3 +74,16 @@ typings/
 
 #sass
 .sass-cache
+
+#dist/*
+
+.next
+
+# OS generated files
+.DS_Store
+
+
+public
+public/*
+
+utils

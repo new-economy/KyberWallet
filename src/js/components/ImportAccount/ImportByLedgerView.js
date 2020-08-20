@@ -2,14 +2,11 @@ import React from "react"
 
 const ImportByLedgerView = (props) => {
   return (
-    <div className="importer ledger">
-      <a onClick={() => props.showLoading('ledger')}>
-        <img src={require('../../../assets/img/ledger.svg')} />
-        <div class="description">{props.translate("import.from_ledger") || <span>Import from<br />ledger wallet</span>}</div>
-      </a>
+    <div className="import-account__block theme__import-button" onClick={(e) => props.showLoading('ledger')}>
+      <div className="import-account__icon ledger"/>
+      <div className="import-account__name">{props.translate("import.from_ledger") || "LEDGER"}</div>
     </div>
   )
-
 }
 
 export default ImportByLedgerView

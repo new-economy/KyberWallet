@@ -1,8 +1,4 @@
-import { REHYDRATE } from 'redux-persist/lib/constants'
-import Tx from "../services/tx"
-
-const initState = {
-}
+const initState = {}
 
 const txs = (state = initState, action) => {
   switch (action.type) {
@@ -34,6 +30,7 @@ const txs = (state = initState, action) => {
       }
     }
   }
+ 
   return state
 }
 

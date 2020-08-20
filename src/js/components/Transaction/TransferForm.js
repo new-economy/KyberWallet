@@ -1,83 +1,172 @@
 import React from "react"
-import { Link } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
-import { filterInputNumber, restrictInputNumber } from "../../utils/validators";
+import { filterInputNumber } from "../../utils/validators";
+import { ImportAccount } from "../../containers/ImportAccount";
+import { AdvanceAccount } from "../../containers/TransactionCommon"
+import { PostTransfer } from "../../containers/Transfer";
+import BalancePercentage from "../TransactionCommon/BalancePercentage";
 
 const TransferForm = (props) => {
+  const { isOnMobile } = props.global;
+
   function handleChangeAmount(e) {
     var check = filterInputNumber(e, e.target.value, props.input.amount.value)
-    if(check) props.input.amount.onChange(e)
+    if (check) props.input.amount.onChange(e)
   }
 
-  var render = (
-    <div id="transfer-screen">
-      <div class="frame">
-        <div class="row small-11 medium-12 large-12">
-          <div class="column">
-            <h1 class="title">
-              <Link to="/exchange">{props.translate("transaction.exchange") || "Exchange"}</Link>
-              <Link to="/transfer" className="disable">{props.translate("transaction.transfer") || "Transfer"}</Link>
-            </h1>
-            <form action="#" method="get">
-              <div class="row">
-                <div class="column small-12 medium-7">
+  var errorSource = []
+  var isErrorSource = false  
+  Object.values(props.transfer.errors.sourceAmount).map(value => {
+    isErrorSource = true
+    errorSource.push(value)
+  })
+  if(props.global.eligibleError) {
+    isErrorSource = true
+    errorSource.push(props.global.eligibleError)
+  }
 
-                  <label className={props.errors.destAddress !== '' ? "error" : ""}>
-                    <span className="transaction-label">{props.translate("transaction.address") || "Receiving Address"}</span>
-                    <input className="hashAddr" value={props.input.destAddress.value} onChange={props.input.destAddress.onChange}>
-                    </input>
-                    {props.errors.destAddress &&
-                      <span class="error-text">{props.translate(props.errors.destAddress)}</span>
-                    }
-                  </label>
-                </div>
+  var errorDestAddr = []
+  var isErrorDestAddr = false  
+  Object.values(props.transfer.errors.destAddress).map(value => {
+    isErrorDestAddr = true
+    errorDestAddr.push(value)
+  })
 
-                <div class="column small-12 medium-5">
-                  <label>
-                    <span className="transaction-label">
-                      {props.translate("transaction.token_amount") || "Token & Amount To Send"}
-                    </span>
+  const sourceErrors = errorSource.map((value, index) => {
+    return <div className={"exchange__error-item"} key={index}>{value}</div>
+  });
 
-                    <div className={props.errors.amountTransfer !== '' ? "error select-token-panel" : "select-token-panel"}>
-                      {props.tokenTransferSelect}
-                      <input type="text" min="0" step="0.000001" placeholder="0"
-                        value={props.input.amount.value} className="amount-input"
-                        onChange={handleChangeAmount}
-                        maxLength="50" autoComplete="off"
-                      />
+  const destErrors = errorDestAddr.map((value, index) => {
+    return <div className={"exchange__error-item"} key={index}>{value}</div>
+  });
+
+  var importAccount = function () {
+    if (props.account === false || (props.isChangingWallet && props.changeWalletType === "transfer")) {
+      return (
+        <ImportAccount
+          tradeType="transfer"
+          isChangingWallet={props.isChangingWallet}
+          closeChangeWallet={props.closeChangeWallet}
+          isAgreedTermOfService={props.isAgreedTermOfService}
+          acceptTerm={props.acceptTerm}
+        />
+      )
+    }
+  }
+
+  return (
+    <div className={"exchange__form theme__background-2"}>
+      <div>
+        <div className="exchange-content-wrapper">
+          {props.networkError !== "" && (
+            <div className="network_error">
+              <img src={require("../../../assets/img/warning.svg")} />
+              {props.networkError}
+            </div>
+          )}
+          <div className={"exchange-content"}>
+            <div className={"exchange-content__item--wrapper"}>
+              <div className={"exchange-item-label"}>{props.translate("transaction.exchange_from") || "From"}:</div>
+              <div className={`exchange-content__item exchange-content__item--left theme__background-4 exchange-content__item--transfer select-token ${props.account !== false ? 'has-account' : ''} ${isErrorSource ? "error" : ""}`}>
+                <div className={`input-div-content`}>
+                  <div className={"exchange-content__label-content"}>
+                    <div className="exchange-content__select select-token-panel">{props.tokenTransferSelect}</div>
+                  </div>
+                  <div className={"exchange-content__input-container"}>
+                    <div className={"main-input main-input__left"}>
+                      <div className="input-tooltip-wrapper">
+                        <input
+                          className={`exchange-content__input theme__background-4 theme__text-4 ${props.account !== false ? 'has-account' : ''}`}
+                          type={isOnMobile ? "number" : "text"}
+                          min="0"
+                          step="0.000001"
+                          placeholder="0"
+                          id="inputSource"
+                          value={props.input.amount.value}
+                          onChange={handleChangeAmount}
+                          onBlur={props.onBlur}
+                          onFocus={props.onFocus}
+                          maxLength="50"
+                          autoComplete="off"
+                        />
+                      </div>
                     </div>
-                    {props.errors.amountTransfer &&
-                      <span class="error-text">{props.translate(props.errors.amountTransfer)}</span>
-                    }
-                  </label>
-                  <div class="address-balance clearfix">
-                    <span class="note">{props.translate("transaction.address_balance") || "Address Balance"}</span>
-                    <a className="value" onClick={props.setAmount}>
-                      <span title={props.balance.value}>
-                        {props.balance.roundingValue} {props.tokenSymbol}
-                      </span>
-                      <span class="k k-info k-2x ml-3" data-tip={props.translate('transaction.click_to_transfer_all_balance') || 'Click to transfer all balance'} data-for="balance-notice-tip" currentitem="false"></span>
-                      <ReactTooltip place="bottom" id="balance-notice-tip" type="light" />
-                    </a>
                   </div>
                 </div>
               </div>
-            </form>
+
+              {isErrorSource &&
+                <div className={"exchange__error"}>{sourceErrors}</div>
+              }
+
+              {props.account !== false && (
+                <div className={"common__flexbox"}>
+                  <div className={"exchange__balance"}>
+                    <div>{props.tokenSymbol} Balance</div>
+                    <div>{props.addressBalance.roundingValue} {props.tokenSymbol}</div>
+                  </div>
+
+                  <BalancePercentage
+                    addressBalance={props.addressBalance.value}
+                    gas={props.transfer.gas}
+                    gasPrice={props.transfer.gasPrice}
+                    sourceTokenSymbol={props.tokenSymbol}
+                    changeSourceAmount={props.changeSourceAmount}
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className={"exchange-content__item--middle"}>
+              <i className={"transfer__arrow"}/>
+            </div>
+
+            <div className={"exchange-content__item--wrapper"}>
+              <div className={"exchange-item-label"}>{props.translate("transaction.address") || "To Address"}:</div>
+              <div className={`exchange-content__item exchange-content__item--right theme__background-4 select-token ${isErrorDestAddr ? "error" : ""}`}>
+                <div className={`input-div-content`}>
+                  <div className="exchange-content__input-container exchange-content__input-container--to exchange-content__transfer-addr">
+                    <div className="input-tooltip-wrapper">
+                      <input
+                        className={`exchange-content__input theme__background-4 theme__text-4 exchange-content__input-address ${props.global.isOnMobile && "p-l-50px" }`}
+                        value={props.input.destAddress.value}
+                        onChange={props.input.destAddress.onChange}
+                        placeholder="0x0de..."
+                        onFocus={props.onFocusAddr}
+                        onBlur={props.onBlur}
+                      />
+                    </div>
+                    {props.qcCode}
+                  </div>
+                </div>
+              </div>
+
+              {isErrorDestAddr &&
+                <div className={"exchange__error"}>{destErrors}</div>
+              }
+
+              {props.account !== false && (
+                <div className="top-token">
+                  <div className="top-token-more" onClick={props.toggleAdvanceContent}>{props.translate("transaction.advanced") || "Advanced"}</div>
+                  <div className={`top-token__arrow common__triangle theme__border-top ${props.isAdvanceActive ? 'up' : ''}`}/>
+                </div>
+              )}
+
+              {(props.account !== false && props.isAdvanceActive) && (
+                <AdvanceAccount
+                  advanceLayout={props.advanceLayout}
+                  isOpenAdvance={props.isOpenAdvance}
+                />
+              )}
+            </div>
           </div>
         </div>
+        {props.account === false && importAccount()}
       </div>
 
-      {props.gasConfig}
-      {props.transferButton}
-    </div>
-  )
-  return (
-
-    <div>
-      {props.step !== 2 ? render : ''}
-      <div class="page-3">
-        {props.step == 2 ? props.transactionLoadingScreen : ''}
-      </div>
+      {props.account !== false &&
+        <PostTransfer destAddress={props.input.destAddress.value}/>
+      }
     </div>
   )
 }
